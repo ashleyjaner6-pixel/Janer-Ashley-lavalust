@@ -4,13 +4,13 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 class Student extends Model {
     public function get_profile() {
         return [
-            'student_no' => '2026-0001',
-            'name' => 'Your Name',
+            'student_no' => '2024-00172',
+            'name' => 'Ashley Rhiene G. Janer',
             'course' => 'BS Information Technology',
-            'year_level' => '2nd Year',
-            'section' => 'A',
-            'email' => 'your.email@example.com',
-            'address' => 'Your Address',
+            'year_level' => '3rd Year',
+            'section' => '3-F4',
+            'email' => 'ashleyjaner6@gmail.com',
+            'address' => 'Tawiran, Calapan City, Oriental Mindoro',
         ];
     }
 
