@@ -43,6 +43,8 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 */
 require_once APP_DIR . 'middlewares/RequestFilter.php';
 
-$config['middlewares'] = [
-    'request_filter' => new RequestFilter(),
+$middleware_config = [
+    'middlewares' => [
+        'request_filter' => new RequestFilter(),
+    ],
 ];
