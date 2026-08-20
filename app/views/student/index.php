@@ -37,15 +37,18 @@
 <body>
     <header>
         <div class="brand">Lava<span>Lust</span> / Student Hub</div>
-        <nav><a href="<?= site_url('student'); ?>">Home</a><a href="<?= site_url('student/profile'); ?>">Profile</a></nav>
+        <nav><a href="<?= site_url('student'); ?>">Home</a><?php if (($_GET['access'] ?? '') !== 'required'): ?><a href="<?= site_url('student/profile'); ?>">Profile</a><?php endif; ?></nav>
     </header>
     <main>
         <section>
             <div class="eyebrow">Personal academic space / 2026</div>
             <h1>Make your mark.</h1>
             <p class="intro">A focused student information page built with LavaLust routing, controllers, views, and middleware.</p>
-            <?php if (isset($_GET['access'])): ?><div class="access-note">Profile access requires entering through Student Hub.</div><?php endif; ?>
-            <a href="<?= site_url('student/profile'); ?>" class="profile-link">View student profile</a>
+            <?php if (($_GET['access'] ?? '') === 'required'): ?>
+                <div class="access-note">Profile access requires entering through Student Hub.</div>
+            <?php else: ?>
+                <a href="<?= site_url('student/profile?access=granted'); ?>" class="profile-link">View student profile</a>
+            <?php endif; ?>
         </section>
         <aside class="spotlight">
             <h2><?= htmlspecialchars($name ?? $_SESSION['student']['name'] ?? 'Ashley Rhiene G. Janer'); ?></h2>

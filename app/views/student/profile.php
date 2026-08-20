@@ -40,7 +40,7 @@
 <body>
     <header>
         <div class="brand">Lava<span>Lust</span> / Student Hub</div>
-        <nav><a href="<?= site_url('student'); ?>">Home</a><a href="<?= site_url('student/profile'); ?>">Profile</a></nav>
+        <nav><a href="<?= site_url('student'); ?>">Home</a><a href="<?= site_url('student/profile?access=granted'); ?>">Profile</a></nav>
     </header>
     <main>
         <div class="eyebrow">Confidential academic record / 01</div>

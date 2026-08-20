@@ -9,12 +9,14 @@ class StudentMiddleware
             session_start();
         }
 
-        $from_student_home = preg_match('#/student(?:\?.*)?$#', $_SERVER['HTTP_REFERER'] ?? '') === 1;
+        $access_granted = ($_GET['access'] ?? '') === 'granted';
 
-        if (!($_SESSION['student_access'] ?? false) && !$from_student_home) {
+        if (!($_SESSION['student_access'] ?? false) && !$access_granted) {
             redirect('student?access=required');
             return;
         }
+
+        $_SESSION['student_access'] = true;
 
         return $next();
     }
