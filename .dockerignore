@@ -1,0 +1,4 @@
+.git
+.env
+runtime/logs/*
+runtime/cache/*

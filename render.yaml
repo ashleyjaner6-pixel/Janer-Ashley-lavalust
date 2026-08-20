@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: lavalust-student
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /index.php/student
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: PORT
+        value: "10000"
