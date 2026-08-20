@@ -49,4 +49,4 @@ get_config($middleware_config);
 
 $router->get('/', 'StudentController::index')->middleware('request_filter');
 $router->get('/student', 'StudentController::index')->middleware('request_filter');
-$router->get('/student/profile', 'StudentController::profile')->middleware('request_filter');
+$router->get('/student/profile', 'StudentController::profile')->middleware('request_filter')->middleware('student_middleware');
