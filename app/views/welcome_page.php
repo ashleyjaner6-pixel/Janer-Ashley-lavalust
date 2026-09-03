@@ -1,762 +1,92 @@
 <?php
 defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
+$version = config_item('VERSION') ?? '4.6.0';
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to LavaLust</title>
-    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+    <meta name="description" content="LavaLust is a lightweight, expressive PHP MVC framework.">
+    <title>LavaLust / PHP framework</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700;800&family=Unbounded:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
     <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        :root {
-            --lava: #dd4814;
-            --lava-dim: #b83a10;
-            --lava-glow: rgba(221,72,20,0.15);
-            --lava-glow-strong: rgba(221,72,20,0.25);
-            --bg: #0a0a0b;
-            --bg2: #111113;
-            --bg3: #18181b;
-            --border: rgba(255,255,255,0.07);
-            --border-hot: rgba(221,72,20,0.35);
-            --text: #f4f4f5;
-            --text-muted: #71717a;
-            --text-dim: #3f3f46;
-            --mono: 'JetBrains Mono', monospace;
-            --sans: 'Unbounded', sans-serif;
-        }
-
-        html { scroll-behavior: smooth; }
-
-        body {
-            font-family: var(--sans);
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* ── NOISE TEXTURE ── */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.6;
-        }
-
-        /* ── GRID BACKGROUND ── */
-        body::after {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image:
-                linear-gradient(var(--border) 1px, transparent 1px),
-                linear-gradient(90deg, var(--border) 1px, transparent 1px);
-            background-size: 60px 60px;
-            pointer-events: none;
-            z-index: 0;
-            mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 100%);
-        }
-
-        /* ── GLOW ORBS ── */
-        .orb {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(120px);
-            pointer-events: none;
-            z-index: 0;
-        }
-        .orb-1 {
-            width: 600px; height: 600px;
-            top: -200px; left: -100px;
-            background: radial-gradient(circle, rgba(221,72,20,0.12) 0%, transparent 70%);
-        }
-        .orb-2 {
-            width: 400px; height: 400px;
-            top: 200px; right: -100px;
-            background: radial-gradient(circle, rgba(221,72,20,0.07) 0%, transparent 70%);
-        }
-
-        /* ── LAYOUT ── */
-        .wrap {
-            position: relative;
-            z-index: 1;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        /* ── NAV ── */
-        nav {
-            position: relative;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 1.5rem 2rem;
-            border-bottom: 1px solid var(--border);
-            backdrop-filter: blur(12px);
-            background: rgba(10,10,11,0.6);
-            max-width: 100%;
-        }
-
-        .nav-logo {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            font-size: 1.1rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            color: var(--text);
-            text-decoration: none;
-        }
-
-        .nav-logo .flame {
-            width: 28px; height: 28px;
-            background: var(--lava);
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            box-shadow: 0 0 20px var(--lava-glow-strong);
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        .nav-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 500;
-            padding: 0.4rem 0.8rem;
-            border-radius: 6px;
-            transition: color 0.2s, background 0.2s;
-        }
-
-        .nav-links a:hover { color: var(--text); background: var(--bg3); }
-
-        .nav-links .btn-nav {
-            color: var(--text);
-            background: var(--lava);
-            padding: 0.4rem 1rem;
-            border-radius: 6px;
-            margin-left: 0.5rem;
-            transition: background 0.2s, box-shadow 0.2s;
-        }
-
-        .nav-links .btn-nav:hover {
-            background: var(--lava-dim);
-            box-shadow: 0 0 20px var(--lava-glow-strong);
-        }
-
-        /* ── HERO ── */
-        .hero {
-            padding: 7rem 2rem 5rem;
-            text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: rgba(221,72,20,0.1);
-            border: 1px solid var(--border-hot);
-            color: #f97316;
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            padding: 0.35rem 0.9rem;
-            border-radius: 999px;
-            margin-bottom: 2rem;
-            font-family: var(--mono);
-        }
-
-        .badge::before {
-            content: '';
-            width: 6px; height: 6px;
-            background: var(--lava);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--lava);
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--lava); }
-            50% { opacity: 0.5; box-shadow: 0 0 3px var(--lava); }
-        }
-
-        .hero h1 {
-            font-size: clamp(3rem, 8vw, 6rem);
-            font-weight: 800;
-            line-height: 1;
-            letter-spacing: -0.04em;
-            margin-bottom: 1.5rem;
-        }
-
-        .hero h1 .word-lava { color: var(--lava); }
-        .hero h1 .word-lust {
-            color: transparent;
-            -webkit-text-stroke: 1.5px rgba(255,255,255,0.3);
-        }
-
-        .hero-sub {
-            font-size: 1.15rem;
-            color: var(--text-muted);
-            max-width: 520px;
-            margin: 0 auto 2.5rem;
-            line-height: 1.7;
-            font-weight: 400;
-        }
-
-        .hero-actions {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-family: var(--sans);
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.2s;
-            cursor: pointer;
-            border: none;
-        }
-
-        .btn-primary {
-            background: var(--lava);
-            color: #fff;
-            box-shadow: 0 0 0 0 var(--lava-glow);
-        }
-
-        .btn-primary:hover {
-            background: var(--lava-dim);
-            box-shadow: 0 0 30px var(--lava-glow-strong), 0 4px 15px rgba(0,0,0,0.3);
-            transform: translateY(-1px);
-        }
-
-        .btn-ghost {
-            background: transparent;
-            color: var(--text-muted);
-            border: 1px solid var(--border);
-        }
-
-        .btn-ghost:hover {
-            color: var(--text);
-            border-color: rgba(255,255,255,0.2);
-            background: var(--bg3);
-        }
-
-        /* ── STAT BAR ── */
-        .stats {
-            display: flex;
-            justify-content: center;
-            gap: 3rem;
-            flex-wrap: wrap;
-            padding: 3rem 2rem;
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            position: relative;
-            z-index: 1;
-        }
-
-        .stat { text-align: center; }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--text);
-            letter-spacing: -0.03em;
-            line-height: 1;
-        }
-
-        .stat-value span { color: var(--lava); }
-
-        .stat-label {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            font-weight: 500;
-            margin-top: 0.3rem;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-        }
-
-        /* ── SECTION ── */
-        section {
-            padding: 5rem 2rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .section-label {
-            font-family: var(--mono);
-            font-size: 0.72rem;
-            font-weight: 500;
-            color: var(--lava);
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            margin-bottom: 0.75rem;
-        }
-
-        .section-title {
-            font-size: clamp(1.8rem, 4vw, 2.8rem);
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            line-height: 1.1;
-            margin-bottom: 1rem;
-        }
-
-        .section-desc {
-            color: var(--text-muted);
-            font-size: 1rem;
-            line-height: 1.7;
-            max-width: 480px;
-        }
-
-        /* ── FEATURES GRID ── */
-        .features-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1px;
-            background: var(--border);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            overflow: hidden;
-            margin-top: 3rem;
-        }
-
-        .feature {
-            background: var(--bg);
-            padding: 2rem;
-            transition: background 0.2s;
-            position: relative;
-        }
-
-        .feature:hover { background: var(--bg2); }
-
-        .feature::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--lava-glow-strong), transparent);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .feature:hover::before { opacity: 1; }
-
-        .feature-icon {
-            width: 40px; height: 40px;
-            background: rgba(221,72,20,0.1);
-            border: 1px solid var(--border-hot);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            margin-bottom: 1rem;
-        }
-
-        .feature h3 {
-            font-size: 1rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.01em;
-        }
-
-        .feature p {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            line-height: 1.6;
-        }
-
-        /* ── CODE SECTION ── */
-        .code-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 3rem;
-            align-items: center;
-        }
-
-        .code-block {
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .code-header {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid var(--border);
-            background: var(--bg3);
-        }
-
-        .dot { width: 10px; height: 10px; border-radius: 50%; }
-        .dot-r { background: #ff5f57; }
-        .dot-y { background: #febc2e; }
-        .dot-g { background: #28c840; }
-
-        .code-filename {
-            font-family: var(--mono);
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-left: 0.5rem;
-        }
-
-        .code-body {
-            padding: 1.5rem;
-            font-family: var(--mono);
-            font-size: 0.82rem;
-            line-height: 1.8;
-            color: #a1a1aa;
-            overflow-x: auto;
-        }
-
-        .code-body .kw { color: #f97316; }
-        .code-body .fn { color: #60a5fa; }
-        .code-body .str { color: #86efac; }
-        .code-body .cm { color: #3f3f46; }
-        .code-body .cl { color: #fde68a; }
-        .code-body .var { color: #c4b5fd; }
-
-        /* ── STRUCTURE ── */
-        .structure-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 0.5rem;
-            margin-top: 2rem;
-        }
-
-        .dir-item {
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 0.875rem 1rem;
-            font-family: var(--mono);
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .dir-item:hover {
-            border-color: var(--border-hot);
-            color: var(--text);
-            background: rgba(221,72,20,0.05);
-        }
-
-        .dir-item .dir-icon { color: var(--lava); font-size: 0.9rem; }
-
-        /* ── FOOTER ── */
-        footer {
-            border-top: 1px solid var(--border);
-            padding: 2rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .footer-inner {
-            max-width: 1100px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .footer-meta {
-            font-family: var(--mono);
-            font-size: 0.75rem;
-            color: var(--text-dim);
-            display: flex;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .footer-meta span { color: var(--text-muted); }
-
-        .footer-links {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .footer-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.82rem;
-            transition: color 0.2s;
-        }
-
-        .footer-links a:hover { color: var(--lava); }
-
-        /* ── DIVIDER ── */
-        .divider {
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--border), transparent);
-            margin: 0 2rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* ── ANIMATIONS ── */
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(24px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        .hero > * {
-            animation: fadeUp 0.6s ease both;
-        }
-
-        .hero .badge         { animation-delay: 0.05s; }
-        .hero h1             { animation-delay: 0.15s; }
-        .hero .hero-sub      { animation-delay: 0.25s; }
-        .hero .hero-actions  { animation-delay: 0.35s; }
-
-        @media (max-width: 768px) {
-            .features-layout { grid-template-columns: 1fr; }
-            .code-section { grid-template-columns: 1fr; }
-            nav { padding: 1rem 1.5rem; }
-            .nav-links a:not(.btn-nav) { display: none; }
-            section { padding: 3rem 1.5rem; }
-        }
-    </style>
-</head>
-<body>
-
-<div class="orb orb-1"></div>
-<div class="orb orb-2"></div>
-
-<!-- NAV -->
-<nav>
-    <a class="nav-logo" href="#">
-        <div class="flame">🔥</div>
-        LavaLust
-    </a>
-    <div class="nav-links">
-        <a href="https://lavalust.netlify.app/docs/" target="_blank">Docs</a>
-        <a href="https://github.com/ronmarasigan/LavaLust" target="_blank">GitHub</a>
-        <a href="https://lavalust.netlify.app/docs/" target="_blank" class="btn-nav">Get Started →</a>
-    </div>
-</nav>
-
-<!-- HERO -->
-<div class="hero wrap">
-    <div class="badge">v<?php echo config_item('VERSION') ?? '4.x'; ?> — Now Available</div>
-    <h1>
-        <span class="word-lava">Lava</span><span class="word-lust">Lust</span><br>Framework
-    </h1>
-    <p class="hero-sub">
-        A lightweight, expressive PHP MVC framework built for developers who want structure without the bloat.
-    </p>
-    <div class="hero-actions">
-        <a href="https://lavalust.netlify.app/docs/" target="_blank" class="btn btn-primary">
-            Read the Docs
-        </a>
-        <a href="https://github.com/ronmarasigan/LavaLust" target="_blank" class="btn btn-ghost">
-            View on GitHub
-        </a>
-    </div>
-</div>
-
-<!-- STATS -->
-<div class="stats">
-    <div class="stat">
-        <div class="stat-value">MVC<span>+</span></div>
-        <div class="stat-label">Architecture</div>
-    </div>
-    <div class="stat">
-        <div class="stat-value"><span>4</span> DB</div>
-        <div class="stat-label">Drivers</div>
-    </div>
-    <div class="stat">
-        <div class="stat-value">HMVC<span>✓</span></div>
-        <div class="stat-label">Module Support</div>
-    </div>
-    <div class="stat">
-        <div class="stat-value">REST<span>*</span></div>
-        <div class="stat-label">API Ready</div>
-    </div>
-</div>
-
-<div class="divider"></div>
-
-<!-- FEATURES -->
-<section>
-    <div class="wrap">
-        <div class="section-label">// features</div>
-        <h2 class="section-title">Everything you need.<br>Nothing you don't.</h2>
-        <p class="section-desc">LavaLust gives you a clean, consistent structure so you can focus on building — not configuring.</p>
-
-        <div class="features-layout">
-            <div class="feature">
-                <div class="feature-icon">🧠</div>
-                <h3>MVC Architecture</h3>
-                <p>Clean separation between Models, Views, and Controllers keeps your codebase maintainable as it grows.</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">⚙️</div>
-                <h3>Flexible Routing</h3>
-                <p>Define routes with GET, POST, PUT, DELETE and more. Supports named routes, closures, and grouped prefixes.</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">🗄️</div>
-                <h3>ORM-style Models</h3>
-                <p>Fluent query builder with relationships, soft deletes, timestamps, mass assignment protection, and eager loading.</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">📦</div>
-                <h3>HMVC Modules</h3>
-                <p>Scale your app with self-contained modules. Each module owns its controllers, models, and views.</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">🔗</div>
-                <h3>REST API Support</h3>
-                <p>Build JSON APIs out of the box using built-in conventions, response helpers, and content negotiation.</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">🛡️</div>
-                <h3>Libraries & Helpers</h3>
-                <p>Sessions, form validation, file uploads, pagination, encryption — batteries included where it counts.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- CODE EXAMPLE -->
-<section>
-    <div class="wrap">
-        <div class="code-section">
-            <div>
-                <div class="section-label">// quick start</div>
-                <h2 class="section-title">Up and running in minutes.</h2>
-                <p class="section-desc">Define a route, write a controller method, render a view. That's the whole loop.</p>
-            </div>
-
-            <div>
-                <div class="code-block" style="margin-bottom:1rem;">
-                    <div class="code-header">
-                        <div class="dot dot-r"></div>
-                        <div class="dot dot-y"></div>
-                        <div class="dot dot-g"></div>
-                        <span class="code-filename">app/config/routes.php</span>
-                    </div>
-                    <div class="code-body">
-<span class="var">$router</span>-><span class="fn">get</span>(<span class="str">'/'</span>, <span class="str">'Welcome::index'</span>);<br>
-<span class="var">$router</span>-><span class="fn">get</span>(<span class="str">'/users'</span>, <span class="str">'Users::index'</span>);<br>
-<span class="var">$router</span>-><span class="fn">post</span>(<span class="str">'/users/store'</span>, <span class="str">'Users::store'</span>);
-                    </div>
-                </div>
-
-                <div class="code-block">
-                    <div class="code-header">
-                        <div class="dot dot-r"></div>
-                        <div class="dot dot-y"></div>
-                        <div class="dot dot-g"></div>
-                        <span class="code-filename">app/controllers/Welcome.php</span>
-                    </div>
-                    <div class="code-body">
-<span class="kw">class</span> <span class="cl">Welcome</span> <span class="kw">extends</span> <span class="cl">Controller</span> {<br>
-&nbsp;&nbsp;<span class="kw">public function</span> <span class="fn">index</span>() {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">$this</span>-><span class="fn">call</span>-><span class="fn">model</span>(<span class="str">'UserModel'</span>);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">$data</span>[<span class="str">'users'</span>] = <span class="var">$this</span>-><span class="cl">UserModel</span>-><span class="fn">all</span>();<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">$this</span>-><span class="fn">call</span>-><span class="fn">view</span>(<span class="str">'welcome'</span>, <span class="var">$data</span>);<br>
-&nbsp;&nbsp;}<br>
-}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- STRUCTURE -->
-<section>
-    <div class="wrap">
-        <div class="section-label">// project structure</div>
-        <h2 class="section-title">Organized by default.</h2>
-        <p class="section-desc">A predictable directory layout so every file has a logical home from day one.</p>
-
-        <div class="structure-grid">
-            <?php
-            $dirs = [
-                ['app/config',      '⚙'],
-                ['app/controllers', '🎮'],
-                ['app/helpers',     '🔧'],
-                ['app/libraries',   '📚'],
-                ['app/language',    '🌐'],
-                ['app/middlewares', '🛡️'],
-                ['app/migrations',  '🔄'],
-                ['app/models',      '🗄'],
-                ['app/modules',     '📦'],
-                ['app/views',       '🖼'],
-                ['public/',         '🌍'],
-                ['runtime/',        '⚡'],
-                ['console/',        '💻'],
-                ['scheme/',         '📐'],
-            ];
-            foreach ($dirs as [$name, $icon]): ?>
-            <div class="dir-item">
-                <span class="dir-icon"><?php echo $icon; ?></span>
-                <?php echo $name; ?>
-            </div>
-            <?php endforeach; ?>
-        </div>
-    </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-    <div class="footer-inner">
-        <div class="footer-meta">
-            <span>rendered in <span><?php echo lava_instance()->performance->elapsed_time('lavalust'); ?>s</span></span>
-            <span>memory <span><?php echo lava_instance()->performance->memory_usage(); ?></span></span>
-            <?php if(config_item('environment') === 'development'): ?>
-            <span>version <span><?php echo config_item('version'); ?></span></span>
-            <span style="color: #dd4814;">● development</span>
-            <?php endif; ?>
-        </div>
-        <div class="footer-links">
-            <a href="https://github.com/ronmarasigan/LavaLust" target="_blank">GitHub</a>
-            <a href="https://lavalust.netlify.app/docs/" target="_blank">Docs</a>
-            <a href="https://opensource.org/licenses/MIT" target="_blank">MIT License</a>
-        </div>
-    </div>
-</footer>
-
-</body>
-</html>
+        :root { --paper:#f5f1e9; --ink:#20201e; --muted:#77746d; --line:#d8d2c7; --red:#d94d35; --yellow:#e8b84a; --white:#fffdf8; --mono:'DM Mono',monospace; --sans:'DM Sans',sans-serif; --display:'Manrope',sans-serif; }
+        * { box-sizing:border-box; margin:0; padding:0; }
+        html { scroll-behavior:smooth; }
+        body { background:var(--paper); color:var(--ink); font-family:var(--sans); overflow-x:hidden; }
+        body::before { content:''; position:fixed; inset:0; pointer-events:none; opacity:.3; background-image:radial-gradient(#b7afa1 .7px, transparent .7px); background-size:18px 18px; mask-image:linear-gradient(to bottom, black, transparent 70%); }
+        a { color:inherit; }
+        .shell { max-width:1180px; margin:auto; padding:0 32px; position:relative; }
+        header { border-bottom:1px solid var(--line); position:relative; z-index:2; }
+        nav { min-height:78px; display:flex; align-items:center; justify-content:space-between; }
+        .brand { display:flex; align-items:center; gap:11px; text-decoration:none; font-family:var(--display); font-size:18px; letter-spacing:-.04em; }
+        .brand-mark { width:32px; height:32px; background:var(--red); color:var(--white); display:grid; place-items:center; font-family:var(--mono); font-size:15px; border-radius:7px 7px 7px 2px; transform:rotate(-7deg); }
+        .nav-links { display:flex; align-items:center; gap:25px; font-family:var(--mono); font-size:12px; color:var(--muted); }
+        .nav-links a { text-decoration:none; transition:color .2s; }
+        .nav-links a:hover { color:var(--red); }
+        .nav-cta { padding:10px 15px; border:1px solid var(--ink); border-radius:4px; color:var(--ink); }
+        .nav-cta:hover { background:var(--ink); color:var(--white) !important; }
+        .hero { display:grid; grid-template-columns:1.02fr .98fr; gap:70px; align-items:center; padding:100px 0 92px; }
+        .eyebrow, .kicker { color:var(--red); font:500 11px var(--mono); letter-spacing:.12em; text-transform:uppercase; }
+        .eyebrow { display:flex; align-items:center; gap:10px; margin-bottom:23px; }
+        .eyebrow::before { content:''; width:26px; height:1px; background:var(--red); }
+        h1 { font:800 clamp(48px, 7vw, 91px)/.95 var(--display); letter-spacing:-.085em; max-width:630px; }
+        h1 em { color:var(--red); font-style:normal; }
+        .hero-copy { color:var(--muted); font-size:18px; line-height:1.6; max-width:450px; margin:27px 0 31px; }
+        .actions { display:flex; gap:12px; flex-wrap:wrap; }
+        .button { display:inline-flex; align-items:center; gap:12px; padding:14px 18px; border-radius:4px; text-decoration:none; font:600 13px var(--sans); transition:transform .2s, box-shadow .2s, background .2s; }
+        .button:hover { transform:translateY(-3px); box-shadow:0 8px 18px #20201e1c; }
+        .button-primary { background:var(--red); color:white; }
+        .button-secondary { border:1px solid var(--line); background:var(--white); }
+        .button-secondary:hover { background:#fff; }
+        .blueprint { background:var(--ink); color:var(--white); min-height:410px; padding:27px; border-radius:5px; position:relative; overflow:hidden; box-shadow:16px 17px 0 var(--yellow); }
+        .blueprint::after { content:'MVC'; position:absolute; right:-26px; bottom:-48px; color:#ffffff09; font:800 180px var(--display); letter-spacing:-.12em; }
+        .blueprint-top { display:flex; justify-content:space-between; color:#9f9d94; font:11px var(--mono); border-bottom:1px solid #ffffff18; padding-bottom:18px; }
+        .live { color:#a8d77a; }
+        .live::before { content:'●'; margin-right:7px; }
+        .diagram { display:grid; grid-template-columns:1fr 36px 1fr 36px 1fr; align-items:center; gap:4px; margin-top:59px; position:relative; z-index:1; }
+        .node { border:1px solid #ffffff2b; padding:19px 12px; background:#2a2a27; }
+        .node strong { display:block; color:var(--yellow); font:500 12px var(--mono); margin-bottom:11px; }
+        .node span { color:#b6b5af; font-size:11px; line-height:1.5; }
+        .arrow { color:var(--red); font:20px var(--mono); text-align:center; }
+        .terminal { position:absolute; bottom:25px; left:27px; color:#77786f; font:11px var(--mono); z-index:1; }
+        .terminal b { color:#a8d77a; font-weight:400; }
+        .stats { border-top:1px solid var(--line); border-bottom:1px solid var(--line); display:grid; grid-template-columns:repeat(4,1fr); }
+        .stat { padding:23px 0; border-right:1px solid var(--line); }
+        .stat:not(:first-child) { padding-left:30px; }
+        .stat:last-child { border:0; }
+        .stat strong { display:block; font:800 25px var(--display); letter-spacing:-.06em; }
+        .stat span { color:var(--muted); font:11px var(--mono); text-transform:uppercase; letter-spacing:.07em; }
+        .features { padding:105px 0 112px; display:grid; grid-template-columns:.8fr 1.2fr; gap:90px; }
+        .kicker { margin-bottom:18px; }
+        h2 { font:800 clamp(31px, 4vw, 50px)/1.03 var(--display); letter-spacing:-.075em; max-width:380px; }
+        .features-intro p { color:var(--muted); line-height:1.65; max-width:330px; margin-top:22px; }
+        .feature-list { display:grid; grid-template-columns:1fr 1fr; border-top:1px solid var(--line); }
+        .feature { padding:24px 18px 23px 0; border-bottom:1px solid var(--line); }
+        .feature:nth-child(even) { padding-left:24px; border-left:1px solid var(--line); }
+        .feature b { display:flex; gap:10px; font-size:15px; margin-bottom:9px; }
+        .feature b::before { content:'+'; color:var(--red); font-family:var(--mono); }
+        .feature p { color:var(--muted); font-size:13px; line-height:1.6; }
+        footer { border-top:1px solid var(--line); padding:25px 0; color:var(--muted); font:11px var(--mono); }
+        .footer-row { display:flex; justify-content:space-between; gap:18px; }
+        @keyframes rise { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+        .hero-copy, .eyebrow, h1, .actions { animation:rise .65s both; } .hero-copy{animation-delay:.1s} h1{animation-delay:.18s} .actions{animation-delay:.28s}
+        @media (max-width:760px) { .shell{padding:0 20px} .nav-links{gap:12px}.nav-links a:first-child{display:none} .nav-cta{padding:8px 10px} .hero{grid-template-columns:1fr; gap:56px; padding:67px 0 80px} h1{font-size:clamp(47px,15vw,75px)} .blueprint{box-shadow:9px 10px 0 var(--yellow); min-height:370px}.diagram{margin-top:46px; grid-template-columns:1fr 20px 1fr 20px 1fr}.node{padding:14px 8px}.node strong{font-size:10px}.node span{font-size:9px}.stats{grid-template-columns:1fr 1fr}.stat,.stat:not(:first-child){padding:19px 0 19px 15px}.stat:nth-child(2){border-right:0}.stat strong{font-size:21px}.features{padding:76px 0; grid-template-columns:1fr; gap:48px}.feature-list{grid-template-columns:1fr}.feature:nth-child(even){padding-left:0;border-left:0}.footer-row{flex-direction:column} }
++    </style>
++</head>
++<body>
++<header><nav class="shell"><a class="brand" href="<?= base_url() ?>"><span class="brand-mark">//</span>LavaLust</a><div class="nav-links"><a href="#features">Toolkit</a><a href="https://lavalust.netlify.app/docs/" target="_blank" rel="noopener">Docs</a><a href="<?= base_url('users') ?>" class="nav-cta">View users <span aria-hidden="true">↗</span></a></div></nav></header>
++<main>
++    <section class="hero shell">
++        <div><div class="eyebrow">PHP MVC framework / v<?= htmlspecialchars($version, ENT_QUOTES, 'UTF-8') ?></div><h1>Build with<br><em>less noise.</em></h1><p class="hero-copy">A lightweight, expressive PHP framework for projects that need a clear shape and room to grow.</p><div class="actions"><a class="button button-primary" href="https://lavalust.netlify.app/docs/" target="_blank" rel="noopener">Read the docs <span>↗</span></a><a class="button button-secondary" href="https://github.com/ronmarasigan/LavaLust" target="_blank" rel="noopener">View on GitHub</a></div></div>
++        <div class="blueprint" aria-label="LavaLust MVC architecture diagram"><div class="blueprint-top"><span>lavalust.app</span><span class="live">system ready</span></div><div class="diagram"><div class="node"><strong>MODEL</strong><span>Data layer<br>Queries + rules</span></div><div class="arrow">→</div><div class="node"><strong>VIEW</strong><span>Presentation<br>Clean output</span></div><div class="arrow">→</div><div class="node"><strong>CTRL</strong><span>App logic<br>Routes + flow</span></div></div><div class="terminal"><b>></b> composer create-project lavalust/app_</div></div>
++    </section>
++    <section class="stats shell"><div class="stat"><strong>4.6.0</strong><span>Current release</span></div><div class="stat"><strong>PHP 7.4+</strong><span>Built for PHP</span></div><div class="stat"><strong>MVC +</strong><span>Architecture</span></div><div class="stat"><strong>REST</strong><span>API ready</span></div></section>
++    <section class="features shell" id="features"><div class="features-intro"><div class="kicker">01 / The toolkit</div><h2>Small surface.<br>Serious leverage.</h2><p>Everything is where you expect it to be, with enough built in to keep momentum high.</p></div><div class="feature-list"><article class="feature"><b>Clear MVC core</b><p>Keep application logic, data, and presentation in their proper places.</p></article><article class="feature"><b>Flexible routing</b><p>Map requests to expressive controller actions without ceremony.</p></article><article class="feature"><b>Useful libraries</b><p>Sessions, validation, email, uploads, caching, and more when you need them.</p></article><article class="feature"><b>Modular by nature</b><p>Grow from a focused prototype into a structured application.</p></article></div></section>
++</main>
++<footer><div class="shell footer-row"><span>LavaLust / open-source PHP framework</span><span>Made for thoughtful builders</span></div></footer>
++</body>
++</html>
