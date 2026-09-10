@@ -68,6 +68,9 @@ if ($ssl_ca_base64 !== '') {
         file_put_contents($ssl_ca, $decoded_ca, LOCK_EX);
     }
 }
+if ($ssl_ca !== '' && (!is_file($ssl_ca) || @openssl_x509_read((string) file_get_contents($ssl_ca)) === false)) {
+    $ssl_ca = '';
+}
 
 $database['main'] = array(
     'driver'	=> getenv('DB_DRIVER') ?: '',
