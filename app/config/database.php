@@ -57,6 +57,16 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 |   Example: $database['another_example'] = array('key' => 'value')
 */
 
+$ssl_ca = getenv('DB_SSL_CA') ?: '';
+$ssl_ca_base64 = getenv('DB_SSL_CA_BASE64') ?: '';
+if ($ssl_ca_base64 !== '') {
+    $decoded_ca = base64_decode($ssl_ca_base64, true);
+    if ($decoded_ca !== false) {
+        $ssl_ca = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'lavalust-aiven-ca.pem';
+        file_put_contents($ssl_ca, $decoded_ca, LOCK_EX);
+    }
+}
+
 $database['main'] = array(
     'driver'	=> getenv('DB_DRIVER') ?: '',
     'hostname'	=> getenv('DB_HOST') ?: '',
@@ -66,8 +76,16 @@ $database['main'] = array(
     'database'	=> getenv('DB_NAME') ?: '',
     'charset'	=> getenv('DB_CHARSET') ?: '',
     'dbprefix'	=> getenv('DB_PREFIX') ?: '',
+    'ssl_ca'    => $ssl_ca,
     // Optional for SQLite
     'path'      => ''
 );
+
+$database['main']['driver'] = getenv('DB_DRIVER') ?: 'mysql';
+$database['main']['hostname'] = getenv('DB_HOST') ?: '127.0.0.1';
+$database['main']['port'] = getenv('DB_PORT') ?: '3306';
+$database['main']['username'] = getenv('DB_USER') ?: 'root';
+$database['main']['database'] = getenv('DB_NAME') ?: 'lab5';
+$database['main']['charset'] = getenv('DB_CHARSET') ?: 'utf8mb4';
 
 ?>

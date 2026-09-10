@@ -1,0 +1,7 @@
+.git
+.env
+runtime/*
+!runtime/index.html
+!runtime/session/session_security.json
+.gitignore
+Dockerfile
