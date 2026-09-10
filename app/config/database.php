@@ -60,7 +60,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 $ssl_ca = getenv('DB_SSL_CA') ?: '';
 $ssl_ca_base64 = getenv('DB_SSL_CA_BASE64') ?: '';
 if ($ssl_ca_base64 !== '') {
-    $decoded_ca = base64_decode($ssl_ca_base64, true);
+    $decoded_ca = strpos($ssl_ca_base64, '-----BEGIN CERTIFICATE-----') !== false
+        ? $ssl_ca_base64
+        : base64_decode($ssl_ca_base64, true);
     if ($decoded_ca !== false) {
         $ssl_ca = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'lavalust-aiven-ca.pem';
         file_put_contents($ssl_ca, $decoded_ca, LOCK_EX);
