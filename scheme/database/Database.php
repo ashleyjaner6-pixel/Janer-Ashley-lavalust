@@ -239,7 +239,11 @@ class Database {
         );
 
         if ($driver === 'mysql' && !empty($database_config['ssl_ca'])) {
-            $options[PDO::MYSQL_ATTR_SSL_CA] = $database_config['ssl_ca'];
+            $ssl_ca_path = $database_config['ssl_ca'];
+            if (!is_readable($ssl_ca_path) && defined('ROOT_DIR') && is_readable(ROOT_DIR . basename($ssl_ca_path))) {
+                $ssl_ca_path = ROOT_DIR . basename($ssl_ca_path);
+            }
+            $options[PDO::MYSQL_ATTR_SSL_CA] = $ssl_ca_path;
             $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = true;
         }
 

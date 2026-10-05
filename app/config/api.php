@@ -75,7 +75,11 @@ $config['refresh_token_expiration'] = 604800;
 | Used for Securing endpoint
 |
 */
-$config['jwt_secret'] = getenv('JWT_SECRET') ?: trim((string) @file_get_contents(getenv('JWT_SECRET_FILE') ?: '/etc/secrets/jwt-secret'));
+$jwtSecretFile = getenv('JWT_SECRET_FILE') ?: '/etc/secrets/jwt-secret';
+if (!is_readable($jwtSecretFile) && defined('ROOT_DIR') && is_readable(ROOT_DIR . 'jwt-secret')) {
+	$jwtSecretFile = ROOT_DIR . 'jwt-secret';
+}
+$config['jwt_secret'] = getenv('JWT_SECRET') ?: trim((string) @file_get_contents($jwtSecretFile));
 
 /*
 |--------------------------------------------------------------------------
@@ -85,9 +89,13 @@ $config['jwt_secret'] = getenv('JWT_SECRET') ?: trim((string) @file_get_contents
 | Used for Securing endpoint
 |
 */
-$config['refresh_token_key'] = getenv('REFRESH_TOKEN_KEY') ?: trim((string) @file_get_contents(getenv('REFRESH_TOKEN_KEY_FILE') ?: '/etc/secrets/refresh-token-key'));
+$refreshTokenKeyFile = getenv('REFRESH_TOKEN_KEY_FILE') ?: '/etc/secrets/refresh-token-key';
+if (!is_readable($refreshTokenKeyFile) && defined('ROOT_DIR') && is_readable(ROOT_DIR . 'refresh-token-key')) {
+	$refreshTokenKeyFile = ROOT_DIR . 'refresh-token-key';
+}
+$config['refresh_token_key'] = getenv('REFRESH_TOKEN_KEY') ?: trim((string) @file_get_contents($refreshTokenKeyFile));
 
-error_log('Lab6 API secret diagnostics: jwt_length=' . strlen((string) $config['jwt_secret']) . ', refresh_length=' . strlen((string) $config['refresh_token_key']) . ', jwt_file=' . (is_readable('/etc/secrets/jwt-secret') ? 'readable' : 'missing') . ', refresh_file=' . (is_readable('/etc/secrets/refresh-token-key') ? 'readable' : 'missing'));
+error_log('Lab6 API secret diagnostics: jwt_length=' . strlen((string) $config['jwt_secret']) . ', refresh_length=' . strlen((string) $config['refresh_token_key']) . ', jwt_file=' . (is_readable($jwtSecretFile) ? 'readable' : 'missing') . ', refresh_file=' . (is_readable($refreshTokenKeyFile) ? 'readable' : 'missing'));
 
 /*
 |--------------------------------------------------------------------------
