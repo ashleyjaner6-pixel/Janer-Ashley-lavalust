@@ -19,13 +19,6 @@ class AuthController extends Controller {
             $username = trim($this->io->post('username'));
             $password = $this->io->post('password');
 
-            if ($username === 'admin' && $password === 'admin123') {
-                $this->session->set_userdata('logged_in', true);
-                $this->session->set_userdata('username', 'admin');
-                redirect('products');
-                return;
-            }
-
             $user = $this->UserModel->find_by_username($username);
             if ($user && password_verify($password, $user['password_hash'])) {
                 $this->session->set_userdata('logged_in', true);

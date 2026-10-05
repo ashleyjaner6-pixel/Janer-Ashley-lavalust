@@ -44,7 +44,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 | and disable it back when you're done.
 |
 */
-$config['api_helper_enabled'] = FALSE;
+$config['api_helper_enabled'] = TRUE;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,7 +54,7 @@ $config['api_helper_enabled'] = FALSE;
 | Used for Payload Token Expiration
 |
 */
-$config['payload_token_expiration'] = 900;
+$config['payload_token_expiration'] = (int) (getenv('ACCESS_TOKEN_TTL') ?: 900);
 
 
 /*
@@ -75,7 +75,7 @@ $config['refresh_token_expiration'] = 604800;
 | Used for Securing endpoint
 |
 */
-$config['jwt_secret'] = 'l99H8TM4Q4JXFM3Hr8LN';
+$config['jwt_secret'] = getenv('JWT_SECRET') ?: '';
 
 /*
 |--------------------------------------------------------------------------
@@ -85,7 +85,7 @@ $config['jwt_secret'] = 'l99H8TM4Q4JXFM3Hr8LN';
 | Used for Securing endpoint
 |
 */
-$config['refresh_token_key'] = 'BDswlrEaYWAgeJ4VurGe';
+$config['refresh_token_key'] = getenv('REFRESH_TOKEN_KEY') ?: '';
 
 /*
 |--------------------------------------------------------------------------
@@ -96,7 +96,10 @@ $config['refresh_token_key'] = 'BDswlrEaYWAgeJ4VurGe';
 | already deployed.
 |
 */
-$config['allow_origin'] = '*';
+$config['allow_origin'] = getenv('FRONTEND_ORIGIN') ?: 'http://localhost:5173';
+
+$config['jwt_issuer'] = getenv('JWT_ISSUER') ?: 'product-api';
+$config['jwt_audience'] = getenv('JWT_AUDIENCE') ?: 'product-frontend';
 
 /*
 |--------------------------------------------------------------------------

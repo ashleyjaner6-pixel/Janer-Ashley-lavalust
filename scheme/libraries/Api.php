@@ -113,6 +113,10 @@ class Api
         $this->refresh_token_key = config_item('refresh_token_key');
         $this->allow_origin = config_item('allow_origin');
 
+        if (strlen((string) $this->jwt_secret) < 32 || strlen((string) $this->refresh_token_key) < 32) {
+            show_error('JWT_SECRET and REFRESH_TOKEN_KEY must each contain at least 32 characters.');
+        }
+
         //Handle CORS
         $this->handle_cors();
 
@@ -132,9 +136,13 @@ class Api
      */
     public function handle_cors()
     {
-        header("Access-Control-Allow-Origin: {$this->allow_origin}");
-        header("Access-Control-Allow-Headers: Authorization, Content-Type");
-        header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+        $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+        if ($this->allow_origin === '*' || ($origin !== '' && hash_equals($this->allow_origin, $origin))) {
+            header('Access-Control-Allow-Origin: ' . ($this->allow_origin === '*' ? '*' : $origin));
+            header('Vary: Origin');
+        }
+        header('Access-Control-Allow-Headers: Authorization, Content-Type, X-Requested-With');
+        header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
         header("Content-Type: application/json; charset=UTF-8");
     }
 
@@ -234,6 +242,9 @@ class Api
         if (count($parts) !== 3) return false;
         [$header, $payload, $signature] = $parts;
 
+        $header_data = json_decode(base64_decode($header), true);
+        if (($header_data['alg'] ?? '') !== 'HS256') return false;
+
         $valid_sig = base64_encode(hash_hmac('sha256', "$header.$payload", $this->jwt_secret, true));
         if (!hash_equals($valid_sig, $signature)) return false;
 
@@ -252,7 +263,9 @@ class Api
         if (!$payload) return false;
 
         if (!isset($payload['sub'], $payload['iat'], $payload['exp'])) return false;
-        if ($payload['exp'] < time()) return false;
+        if ($payload['exp'] <= time()) return false;
+        if (($payload['iss'] ?? '') !== config_item('jwt_issuer')) return false;
+        if (($payload['aud'] ?? '') !== config_item('jwt_audience')) return false;
 
         return $payload;
     }

@@ -7,38 +7,9 @@
 ## Documentation
 [LavaLust Documentation Link](https://lavalust.netlify.app)
 
-## Laboratory Exercise 5
+## Laboratory Exercise 6
 
-This project includes an authenticated product CRUD application at `/products`.
-Unauthenticated requests are redirected to `/login`.
-
-### Database setup
-
-1. Create an Aiven MySQL service and database.
-2. Run [`database/schema.sql`](database/schema.sql) against that database.
-3. Generate a password hash and insert an application user:
-
-```bash
-php -r "echo password_hash('your-password', PASSWORD_DEFAULT), PHP_EOL;"
-```
-
-```sql
-INSERT INTO users (username, password) VALUES ('admin', 'PASTE_HASH_HERE');
-```
-
-Do not commit the real password. Configure `DB_HOST`, `DB_PORT`, `DB_DATABASE`,
-`DB_USERNAME`, and `DB_PASSWORD` as environment variables. See
-[`.env.example`](.env.example) for the variable names.
-
-### Render deployment
-
-Create a Render Web Service from the GitHub repository with Docker deployment.
-The included `Dockerfile` starts Apache and enables URL rewriting. Add the five
-database environment variables in Render using the values supplied by Aiven.
-
-Verify the workflow in order: `/login`, `/products`, create, edit, and delete.
-Capture the login, product list, add form, edit form, delete result, and Aiven
-`products` table for submission.
+This repository provides the LavaLust JSON API for the React product-management frontend. The API routes, authentication, Aiven schema, and Render environment variables are documented in [README-LAB6.md](README-LAB6.md).
 
 <p>
     Note: If you are using PLDT, you need to use google dns (8.8.8.8) to open the documentation website. There is

@@ -21,7 +21,8 @@ if ($has_env_db) {
             'charset'  => 'utf8mb4',
             'collate'  => 'utf8mb4_unicode_ci',
             'prefix'   => '',
-            'dbprefix' => ''
+            'dbprefix' => '',
+            'ssl_ca'   => getenv('DB_SSL_CA') ?: ''
         ),
         'default' => array(
             'hostname' => $host,
@@ -33,7 +34,8 @@ if ($has_env_db) {
             'charset'  => 'utf8mb4',
             'collate'  => 'utf8mb4_unicode_ci',
             'prefix'   => '',
-            'dbprefix' => ''
+            'dbprefix' => '',
+            'ssl_ca'   => getenv('DB_SSL_CA') ?: ''
         )
     );
 } else {
