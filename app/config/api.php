@@ -87,6 +87,8 @@ $config['jwt_secret'] = getenv('JWT_SECRET') ?: trim((string) @file_get_contents
 */
 $config['refresh_token_key'] = getenv('REFRESH_TOKEN_KEY') ?: trim((string) @file_get_contents(getenv('REFRESH_TOKEN_KEY_FILE') ?: '/etc/secrets/refresh-token-key'));
 
+error_log('Lab6 API secret diagnostics: jwt_length=' . strlen((string) $config['jwt_secret']) . ', refresh_length=' . strlen((string) $config['refresh_token_key']) . ', jwt_file=' . (is_readable('/etc/secrets/jwt-secret') ? 'readable' : 'missing') . ', refresh_file=' . (is_readable('/etc/secrets/refresh-token-key') ? 'readable' : 'missing'));
+
 /*
 |--------------------------------------------------------------------------
 | Access-Control-Allow-Origin
