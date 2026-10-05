@@ -95,7 +95,6 @@ if (!is_readable($refreshTokenKeyFile) && defined('ROOT_DIR') && is_readable(ROO
 }
 $config['refresh_token_key'] = getenv('REFRESH_TOKEN_KEY') ?: trim((string) @file_get_contents($refreshTokenKeyFile));
 
-error_log('Lab6 API secret diagnostics: jwt_length=' . strlen((string) $config['jwt_secret']) . ', refresh_length=' . strlen((string) $config['refresh_token_key']) . ', jwt_file=' . (is_readable($jwtSecretFile) ? 'readable' : 'missing') . ', refresh_file=' . (is_readable($refreshTokenKeyFile) ? 'readable' : 'missing'));
 
 /*
 |--------------------------------------------------------------------------

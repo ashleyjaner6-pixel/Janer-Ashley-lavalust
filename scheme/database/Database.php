@@ -238,12 +238,23 @@ class Database {
             PDO::ATTR_EMULATE_PREPARES   => false,
         );
 
+        $temporary_ssl_ca = null;
         if ($driver === 'mysql' && !empty($database_config['ssl_ca'])) {
-            $ssl_ca_path = $database_config['ssl_ca'];
-            if (!is_readable($ssl_ca_path) && defined('ROOT_DIR') && is_readable(ROOT_DIR . basename($ssl_ca_path))) {
-                $ssl_ca_path = ROOT_DIR . basename($ssl_ca_path);
+            $ssl_ca = trim($database_config['ssl_ca']);
+            if (strpos($ssl_ca, '-----BEGIN CERTIFICATE-----') === 0) {
+                $temporary_ssl_ca = tempnam(sys_get_temp_dir(), 'aiven-ca-');
+                if ($temporary_ssl_ca === false || file_put_contents($temporary_ssl_ca, $ssl_ca . PHP_EOL, LOCK_EX) === false) {
+                    throw new PDOException('Unable to prepare the Aiven CA certificate.');
+                }
+                chmod($temporary_ssl_ca, 0600);
+                $options[PDO::MYSQL_ATTR_SSL_CA] = $temporary_ssl_ca;
+            } else {
+                $ssl_ca_path = $ssl_ca;
+                if (!is_readable($ssl_ca_path) && defined('ROOT_DIR') && is_readable(ROOT_DIR . basename($ssl_ca_path))) {
+                    $ssl_ca_path = ROOT_DIR . basename($ssl_ca_path);
+                }
+                $options[PDO::MYSQL_ATTR_SSL_CA] = $ssl_ca_path;
             }
-            $options[PDO::MYSQL_ATTR_SSL_CA] = $ssl_ca_path;
             $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = true;
         }
 
@@ -258,6 +269,10 @@ class Database {
                 $this->bindValues ?? [],
                 $e
             );
+        } finally {
+            if ($temporary_ssl_ca !== null && file_exists($temporary_ssl_ca)) {
+                unlink($temporary_ssl_ca);
+            }
         }
     }
 
