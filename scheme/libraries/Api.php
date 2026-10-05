@@ -205,7 +205,6 @@ class Api
     {
         http_response_code($code);
         $json = json_encode($data);
-        error_log('Lab6 response diagnostic: status=' . $code . ', json_length=' . strlen((string) $json));
         echo $json;
         exit;
     }
