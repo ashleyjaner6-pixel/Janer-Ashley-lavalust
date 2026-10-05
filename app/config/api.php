@@ -75,7 +75,7 @@ $config['refresh_token_expiration'] = 604800;
 | Used for Securing endpoint
 |
 */
-$config['jwt_secret'] = getenv('JWT_SECRET') ?: '';
+$config['jwt_secret'] = getenv('JWT_SECRET') ?: trim((string) @file_get_contents(getenv('JWT_SECRET_FILE') ?: '/etc/secrets/jwt-secret'));
 
 /*
 |--------------------------------------------------------------------------
@@ -85,7 +85,7 @@ $config['jwt_secret'] = getenv('JWT_SECRET') ?: '';
 | Used for Securing endpoint
 |
 */
-$config['refresh_token_key'] = getenv('REFRESH_TOKEN_KEY') ?: '';
+$config['refresh_token_key'] = getenv('REFRESH_TOKEN_KEY') ?: trim((string) @file_get_contents(getenv('REFRESH_TOKEN_KEY_FILE') ?: '/etc/secrets/refresh-token-key'));
 
 /*
 |--------------------------------------------------------------------------
