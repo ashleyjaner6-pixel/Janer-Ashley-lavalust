@@ -171,5 +171,6 @@ $path = preg_replace('#^/index\.php#i', '', $path);
 $path = $path === '' ? '/' : $path;
 $url = $router->sanitize_url($path);
 $method = isset($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : '';
+error_log('Lab6 route diagnostic: request_uri=' . $raw_uri . ', path=' . $path . ', route_url=' . $url . ', method=' . $method);
 $router->initiate($url, $method);
 ?>

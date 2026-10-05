@@ -15,12 +15,14 @@ class ProductApi extends Controller
 
     public function health()
     {
+        error_log('Lab6 controller diagnostic: health reached');
         $this->api->require_method('GET');
         $this->api->respond(['status' => 'ok']);
     }
 
     public function login()
     {
+        error_log('Lab6 controller diagnostic: login reached');
         $this->api->require_method('POST');
         $input = $this->request_body();
         $username = trim((string) ($input['username'] ?? ''));
@@ -70,6 +72,7 @@ class ProductApi extends Controller
 
     public function products()
     {
+        error_log('Lab6 controller diagnostic: products reached, method=' . ($_SERVER['REQUEST_METHOD'] ?? 'unknown'));
         $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? '');
         if ($method === 'GET') {
             $this->index();
